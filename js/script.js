@@ -188,7 +188,8 @@ function addClickListenersToTags(){
   }
 }
 
-addClickListenersToTags();
+
+
 
 function generateAuthors(){
 
@@ -282,7 +283,6 @@ function calculaTagsParams(tags = {}) {
 
   return result;
 
-
 }
 
 function calculateTagClass (count, params){
@@ -292,7 +292,6 @@ function calculateTagClass (count, params){
   } else if (count == params['max']){
     return optCloudClassPrefix + '5';
   }
-
 
 }
 
@@ -358,3 +357,4 @@ function generateTags(){
 }
 
 generateTags();
+addClickListenersToTags();
