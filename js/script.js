@@ -45,7 +45,8 @@ const optArticleSelector = '.post',
   optTitleSelector = '.post-title',
   optTitleListSelector = '.titles',
   optArticleTagsSelector = '.post-tags .list',
-  optArticleAuthorSelector =".post-author";
+  optArticleAuthorSelector ='.post-author',
+  optTagsListSelector = '.tags.list';
 
 function generateTitleLinks(customSelector = '') {
 
@@ -58,7 +59,6 @@ function generateTitleLinks(customSelector = '') {
 
   const listArticles = document.querySelectorAll(optArticleSelector + customSelector);
 
-
   let html = '';
 
   for (let article of listArticles){
@@ -68,7 +68,7 @@ function generateTitleLinks(customSelector = '') {
 
 
     /* get title and save in const  */
-    const articleTitle = article.querySelector(optTitleSelector).innerHTML
+    const articleTitle = article.querySelector(optTitleSelector).innerHTML;
 
 
     /* based on above save link to html  */
@@ -265,3 +265,57 @@ function addClickListenersToAuthors () {
 
 }
 addClickListenersToAuthors();
+
+function generateTags(){
+  /* [NEW] create a new variable allTags with an empty array */
+  let allTags = [];
+
+  /* find all articles */
+  const articles = document.querySelectorAll(optArticleSelector);
+
+  /* START LOOP: for every article: */
+  for (let article of articles){
+
+    /* find tags wrapper */
+    const wrapperTag = article.querySelector(optArticleTagsSelector);
+
+    /* make html variable with empty string */
+    let html = '';
+
+    /* get tags from data-tags attribute */
+    const tags = article.getAttribute('data-tags');
+    
+
+    /* split tags into array */
+    const tagArray = tags.split(" ");
+
+    /* START LOOP: for each tag */
+    for (let tag of tagArray){
+
+      /* generate HTML of the link */
+      const linkHtml = '<li><a href="#tag-'+tag+'">'+tag+'</a></li>';
+
+      /* add generated code to html variable */
+      html = html + linkHtml;
+
+      /* [NEW] check if this link is NOT already in allTags */
+      if(allTags.indexOf(linkHtml) == -1){
+        /* [NEW] add generated code to allTags array */
+        allTags.push(linkHtml);
+      }
+    
+    }
+    /* END LOOP: for each tag */
+    
+    /* insert HTML of all the links into the tags wrapper */
+    wrapperTag.innerHTML = html;
+  /* END LOOP: for every article: */
+  }
+  /* [NEW] find list of tags in right column */
+  const tagList = document.querySelector(optTagsListSelector);
+
+  /* [NEW] add html from allTags to tagList */
+  tagList.innerHTML = allTags.join(' ');
+}
+
+generateTags();
