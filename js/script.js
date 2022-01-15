@@ -46,7 +46,10 @@ const optArticleSelector = '.post',
   optTitleListSelector = '.titles',
   optArticleTagsSelector = '.post-tags .list',
   optArticleAuthorSelector ='.post-author',
-  optTagsListSelector = '.tags.list';
+  optTagsListSelector = '.tags.list',
+  optCloudClassCount = 5,
+  optCloudClassPrefix = 'tag-size-';
+
 
 function generateTitleLinks(customSelector = '') {
 
@@ -251,8 +254,6 @@ function authorClickHandler (event) {
   /* execute function "generateTitleLinks" with article selector as argument */
   generateTitleLinks('[data-author="' + author + '"]');
 
-
-
 }
 
 function addClickListenersToAuthors () {
@@ -266,9 +267,38 @@ function addClickListenersToAuthors () {
 }
 addClickListenersToAuthors();
 
+function calculaTagsParams(tags = {}) {
+
+  const paramTags = [];
+
+  for (let tag in tags)
+    if (!paramTags.includes(tags[tag])){
+      paramTags.push(tags[tag]);
+    }
+  const maxTag = Math.max.apply(Math, paramTags);
+  const minTag = Math.min.apply(Math, paramTags);
+
+  const result = {max: maxTag, min: minTag};
+
+  return result;
+
+
+}
+
+function calculateTagClass (count, params){
+
+  if (count == params['min']){
+    return optCloudClassPrefix + '1';
+  } else if (count == params['max']){
+    return optCloudClassPrefix + '5';
+  }
+
+
+}
+
 function generateTags(){
-  /* [NEW] create a new variable allTags with an empty array */
-  let allTags = [];
+  /* [NEW] create a new variable allTags with an empty obejct */
+  let allTags = {};
 
   /* find all articles */
   const articles = document.querySelectorAll(optArticleSelector);
@@ -299,9 +329,11 @@ function generateTags(){
       html = html + linkHtml;
 
       /* [NEW] check if this link is NOT already in allTags */
-      if(allTags.indexOf(linkHtml) == -1){
+      if(!allTags.hasOwnProperty(tag)){
         /* [NEW] add generated code to allTags array */
-        allTags.push(linkHtml);
+        allTags[tag] = 1;
+      } else {
+        allTags[tag] ++; 
       }
     
     }
@@ -314,8 +346,15 @@ function generateTags(){
   /* [NEW] find list of tags in right column */
   const tagList = document.querySelector(optTagsListSelector);
 
-  /* [NEW] add html from allTags to tagList */
-  tagList.innerHTML = allTags.join(' ');
+  const tagsParams = calculaTagsParams(allTags);
+  console.log("tags Param: ",  tagsParams);
+  let allTagsHTML = '';
+
+  for (let tag in allTags){
+    allTagsHTML += '<li><a href="#tag-'+ tag + '"class="'+calculateTagClass(allTags[tag], tagsParams)+'">'+tag+'</a>(' + allTags[tag] + ')</li>';
+  }
+
+  tagList.innerHTML = allTagsHTML;
 }
 
 generateTags();
