@@ -48,7 +48,8 @@ const optArticleSelector = '.post',
   optArticleAuthorSelector ='.post-author',
   optTagsListSelector = '.tags.list',
   optCloudClassCount = 5,
-  optCloudClassPrefix = 'tag-size-';
+  optCloudClassPrefix = 'tag-size-',
+  optAuthorsListSelector = '.authors.list';
 
 
 function generateTitleLinks(customSelector = '') {
@@ -358,3 +359,47 @@ function generateTags(){
 
 generateTags();
 addClickListenersToTags();
+
+function generateAuthors(){
+  /* [NEW] create a new variable allAUTHOR with an empty obejct */
+  let allAuthors = {};
+
+  /* find all articles */
+  const articles = document.querySelectorAll(optArticleSelector);
+
+  /* make html variable with empty string */
+  let html = '';
+
+  /* START LOOP: for every article: */
+  for (let article of articles){
+
+    /* get AUTHORS from data-author attribute */
+    const author = article.getAttribute('data-author');
+    
+    /* insert HTML of all the links into the html cons */
+    const linkHtml = '<li><a href="#author-'+author+'"><span class="author-name">'+author+'</span></a></li>';
+    html = html + linkHtml;
+
+    /* [NEW] check if this link is NOT already in allAUTHORS */
+    if(!allAuthors.hasOwnProperty(author)){
+      /* [NEW] add generated code to allTags array */
+      allAuthors[author] = 1;
+    } else {
+      allAuthors[author] ++; 
+    }
+  /* END LOOP: for every article: */
+  }
+  console.log(allAuthors);
+  /* [NEW] find list of tags in right column */
+  const authorList = document.querySelector(optAuthorsListSelector);
+ 
+
+  let allAuthorHTML = '';
+
+  for (let author in allAuthors){
+    allAuthorHTML += '<li><a href="#author-'+ author + '"><span class="author-name">'+author+' (' + allAuthors[author] + ')</span></a></li>';
+  }
+  authorList.innerHTML = allAuthorHTML;
+}
+
+generateAuthors();
