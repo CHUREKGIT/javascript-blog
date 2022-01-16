@@ -1,5 +1,14 @@
 'use strict';
 
+/* handlebars tamplates object */
+const templates = {
+  articleLink: Handlebars.compile(document.querySelector('#template-article-link').innerHTML),
+  tagTemplateLink: Handlebars.compile(document.querySelector('#template-tag-link').innerHTML),
+  authorTemplateLink: Handlebars.compile(document.querySelector('#template-author-link').innerHTML),
+  tagCloudLink: Handlebars.compile(document.querySelector('#tag-cloud-link').innerHTML),
+  authorRightLink: Handlebars.compile(document.querySelector('#author-right-link').innerHTML)
+};
+
 function titleClickHandler(event){
   event.preventDefault();
   const clickedElement = this; 
@@ -76,7 +85,8 @@ function generateTitleLinks(customSelector = '') {
 
 
     /* based on above save link to html  */
-    const htmlLink = '<li><a href="#'+articleId+'" class="active"><span>'+articleTitle+'</span></a></li>';
+    const linkHTMLData = {id: articleId, title: articleTitle};
+    const htmlLink = templates.articleLink(linkHTMLData);
 
     /* insert html to table  */
     html = html + htmlLink;
@@ -122,7 +132,8 @@ function generateTags(){
     for (let tag of tagsArr){
 
       /* generate HTML of the link */
-      const linkHtml = '<li><a href="#tag-'+tag+'">'+tag+'</a></li>';
+      const linkHTMLData = {tag: tag};
+      const linkHtml = templates.tagTemplateLink(linkHTMLData);
 
       /* add generated code to html variable */
       html = html + linkHtml;
@@ -210,14 +221,15 @@ function generateAuthors(){
     const dataAuthor = article.getAttribute('data-author');
 
     /* insert HTML of all the links into the AUTHOR wrapper */
-    wrapper.innerHTML = 'by &nbsp;<a href="#author-'+dataAuthor+'">'+dataAuthor+'</a>';
+    const linkHTMLData = {dataAuthor: dataAuthor};
+    const htmlLink = templates.authorTemplateLink(linkHTMLData);
+    wrapper.innerHTML = htmlLink;
 
   /* END LOOP: for every article: */
   }
 
 }
 
-generateAuthors();
 
 function authorClickHandler (event) {
 
@@ -267,6 +279,7 @@ function addClickListenersToAuthors () {
   }
 
 }
+generateAuthors();
 addClickListenersToAuthors();
 
 function calculaTagsParams(tags = {}) {
@@ -296,7 +309,7 @@ function calculateTagClass (count, params){
 
 }
 
-function generateTags(){
+function generateTagsRight(){
   /* [NEW] create a new variable allTags with an empty obejct */
   let allTags = {};
 
@@ -347,20 +360,29 @@ function generateTags(){
   const tagList = document.querySelector(optTagsListSelector);
 
   const tagsParams = calculaTagsParams(allTags);
-  console.log("tags Param: ",  tagsParams);
-  let allTagsHTML = '';
+
+  /* handlebars data */
+
+  const allTagsData = {tags: []};
 
   for (let tag in allTags){
-    allTagsHTML += '<li><a href="#tag-'+ tag + '"class="'+calculateTagClass(allTags[tag], tagsParams)+'">'+tag+'</a>(' + allTags[tag] + ')</li>';
+    
+    allTagsData.tags.push({
+      tag: tag,
+      count: allTags[tag],
+      className: calculateTagClass(allTags[tag], tagsParams)
+    });
+  
   }
 
-  tagList.innerHTML = allTagsHTML;
+  tagList.innerHTML = templates.tagCloudLink(allTagsData);
+ 
 }
 
-generateTags();
+generateTagsRight();
 addClickListenersToTags();
 
-function generateAuthors(){
+function generateAuthorsRight(){
   /* [NEW] create a new variable allAUTHOR with an empty obejct */
   let allAuthors = {};
 
@@ -389,17 +411,25 @@ function generateAuthors(){
     }
   /* END LOOP: for every article: */
   }
-  console.log(allAuthors);
   /* [NEW] find list of tags in right column */
   const authorList = document.querySelector(optAuthorsListSelector);
  
-
-  let allAuthorHTML = '';
+  /* handlebars data */
+  const allAuthorData = {tags: []};
 
   for (let author in allAuthors){
-    allAuthorHTML += '<li><a href="#author-'+ author + '"><span class="author-name">'+author+' (' + allAuthors[author] + ')</span></a></li>';
+    
+    allAuthorData.tags.push({
+      author: author,
+      count: allAuthors[author]
+    });
+  
   }
-  authorList.innerHTML = allAuthorHTML;
+
+  authorList.innerHTML = templates.authorRightLink(allAuthorData);
+
 }
 
-generateAuthors();
+
+
+generateAuthorsRight();
